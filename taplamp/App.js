@@ -1,12 +1,19 @@
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 
 export default function App() {
+  const [isLampOn, setIsLampOn] = useState(false);
+
+  const toggleLamp = () => {
+    setIsLampOn(!isLampOn);
+  };
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+    <View style={[styles.container, isLampOn ? styles.litBackground : styles.dimBackground]}>
+      <TouchableOpacity onPress={toggleLamp} style={styles.switchContainer}>
+        <Text style={styles.switchText}>{isLampOn ? '💡 ON' : 'OFF'}</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -14,8 +21,23 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  litBackground: {
+    backgroundColor: '#FFF8E1', // Warm color for reading
+  },
+  dimBackground: {
+    backgroundColor: '#1E1E1E', // Dark color when lamp is off
+  },
+  switchContainer: {
+    padding: 10,
+    borderRadius: 50,
+    backgroundColor: '#FFD700',
+    alignItems: 'center',
+  },
+  switchText: {
+    fontSize: 24,
+    color: '#000',
   },
 });
