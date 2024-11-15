@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Slider } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import Slider from '@react-native-community/slider'; //imported thhe slider
 
 export default function App() {
   const [isLampOn, setIsLampOn] = useState(false);
@@ -16,7 +17,6 @@ export default function App() {
   };
 
   const changeColorTemperature = () => {
-    // go through three different colors for temperature adjustment
     if (colorTemp === '#FFF8E1') {
       setColorTemp('#E1F5FE'); // Cool white
     } else if (colorTemp === '#E1F5FE') {
@@ -34,7 +34,6 @@ export default function App() {
 
       {isLampOn && (
         <View style={styles.controlsContainer}>
-          {/* Brightness Slider */}
           <Text style={styles.label}>Brightness</Text>
           <Slider
             style={styles.slider}
@@ -44,7 +43,6 @@ export default function App() {
             onValueChange={handleBrightnessChange}
           />
 
-          {/* Color Temperature Button */}
           <TouchableOpacity onPress={changeColorTemperature} style={styles.colorButton}>
             <Text style={styles.buttonText}>Change Color Temperature</Text>
           </TouchableOpacity>
@@ -61,7 +59,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   dimBackground: {
-    backgroundColor: '#1E1E1E', // Dark color when lamp is off
+    backgroundColor: '#1E1E1E',
   },
   switchContainer: {
     padding: 10,
