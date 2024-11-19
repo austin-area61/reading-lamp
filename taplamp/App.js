@@ -1,19 +1,50 @@
-import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { StyleSheet, Text, View, Animated, PanResponder } from 'react-native';
 
 export default function App() {
-  const [isLampOn, setIsLampOn] = useState(false);//tracks whether the lamp is on or off
+  const [isLampOn, setIsLampOn] = useState(false);
 
-  const toggleLamp = () => {//toggles is lamp on when yu tap the screen
-    setIsLampOn(!isLampOn);
-  };
+  const pullPosition = useRef(new Animated.Value(0)).current;
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderMove: (e, gestureState) => {
+        if (gestureState.dy > 0 && gestureState.dy <= 100) {
+          pullPosition.setValue(gestureState.dy);
+        }
+      },
+      onPanResponderRelease: (e, gestureState) => {
+        if (gestureState.dy > 70) {
+          setIsLampOn((prev) => !prev);
+
+          Animated.timing(pullPosition, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: false,
+          }).start();
+        } else {
+          Animated.timing(pullPosition, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: false,
+          }).start();
+        }
+      },
+    })
+  ).current;
 
   return (
     <View style={[styles.container, isLampOn ? styles.litBackground : styles.dimBackground]}>
-      <TouchableOpacity onPress={toggleLamp} style={styles.switchContainer}>
-        <Text style={styles.switchText}>{isLampOn ? '💡 ON' : 'OFF'}</Text>
-      </TouchableOpacity>
+      <View style={styles.switchArea}>
+        <Animated.View
+          {...panResponder.panHandlers}
+          style={[styles.pullSwitch, { transform: [{ translateY: pullPosition }] }]}
+        >
+          <Text style={styles.switchText}>⏬</Text>
+        </Animated.View>
+      </View>
+      <Text style={styles.lampStatus}>{isLampOn ? '💡ON' : 'OFF'}</Text>
     </View>
   );
 }
@@ -23,22 +54,35 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-end',
-    paddingBottom: 40,
+    paddingBottom: 30
   },
   litBackground: {
-    backgroundColor: '#FFF8E1', // Warm color for reading
+    backgroundColor: '#FFF8E1',
   },
   dimBackground: {
-    backgroundColor: '#1E1E1E', // Dark color when lamp is off
+    backgroundColor: '#1E1E1E',
   },
-  switchContainer: {
-    padding: 10,
-    borderRadius: 50,
-    backgroundColor: '#FFD700',
+  switchArea: {
+    flex: 1, // Occupies the full available space
+    justifyContent: 'center', // Centers vertically
     alignItems: 'center',
+    paddingTop: 350,
+  },
+  pullSwitch: {
+    width: 50,
+    height: 50,
+    backgroundColor: 'yellow',
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 5,
   },
   switchText: {
     fontSize: 24,
-    color: '#000',
+  },
+  lampStatus: {
+    fontSize: 18,
+    color: 'black',
+    marginTop: 20,
   },
 });
