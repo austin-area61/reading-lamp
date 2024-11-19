@@ -22,7 +22,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
+    paddingBottom: 40,
   },
   litBackground: {
     backgroundColor: '#FFF8E1', // Warm color for reading
