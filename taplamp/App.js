@@ -1,5 +1,12 @@
 import React, { useState, useRef } from 'react';
-import { StyleSheet, Text, View, Animated, PanResponder } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Animated,
+  PanResponder,
+  Image,
+} from 'react-native';
 
 export default function App() {
   const [isLampOn, setIsLampOn] = useState(false);
@@ -35,7 +42,21 @@ export default function App() {
   ).current;
 
   return (
-    <View style={[styles.container, isLampOn ? styles.litBackground : styles.dimBackground]}>
+    <View
+      style={[
+        styles.container,
+        isLampOn ? styles.litBackground : styles.dimBackground,
+      ]}
+    >
+      {/* Lamp Image */}
+      <Image source={require('./images/lamp.png')} style={styles.lampImage} />
+
+      {/* Light Image (only visible when the lamp is ON) */}
+      {isLampOn && (
+        <Image source={require('./images/light.png')} style={styles.lightImage} />
+      )}
+
+      {/* Pull Switch */}
       <View style={styles.switchArea}>
         <Animated.View
           {...panResponder.panHandlers}
@@ -44,6 +65,7 @@ export default function App() {
           <Text style={styles.switchText}>⏬</Text>
         </Animated.View>
       </View>
+
       <Text style={styles.lampStatus}>{isLampOn ? '💡ON' : 'OFF'}</Text>
     </View>
   );
@@ -54,7 +76,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-end',
-    paddingBottom: 30
+    paddingBottom: 30,
   },
   litBackground: {
     backgroundColor: '#FFF8E1',
@@ -62,9 +84,23 @@ const styles = StyleSheet.create({
   dimBackground: {
     backgroundColor: '#1E1E1E',
   },
+  lampImage: {
+    position: 'absolute',
+    top: 50,
+    width: 100,
+    height: 100,
+    resizeMode: 'contain',
+  },
+  lightImage: {
+    position: 'absolute',
+    top: 150, // Positioned directly below the lamp
+    width: 200,
+    height: 400,
+    resizeMode: 'contain',
+  },
   switchArea: {
-    flex: 1, // Occupies the full available space
-    justifyContent: 'center', // Centers vertically
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
     paddingTop: 350,
   },
