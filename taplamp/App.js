@@ -1,27 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { StyleSheet, Text, View, Image, Switch, Animated } from 'react-native';
 
 export default function App() {
   const [isLampOn, setIsLampOn] = useState(false);
 
-  // Background animation state
-  const backgroundColor = new Animated.Value(0);
+  // Persistent Animated.Value for background color
+  const backgroundColor = useRef(new Animated.Value(0)).current;
 
   // Toggle Lamp Function
   const toggleLamp = () => {
     setIsLampOn((prev) => !prev);
 
     Animated.timing(backgroundColor, {
-      toValue: isLampOn ? 0 : 1,
+      toValue: isLampOn ? 0 : 1, // Switch between 0 (off) and 1 (on)
       duration: 500,
-      useNativeDriver: false, // Note: `useNativeDriver` must be false for colors
+      useNativeDriver: false, // Colors require `useNativeDriver` to be false
     }).start();
   };
 
   // Interpolated background color
   const animatedBackgroundColor = backgroundColor.interpolate({
     inputRange: [0, 1],
-    outputRange: ['#1E1E1E', '#FFF8E1'], // Dark to Light transition
+    outputRange: ['#1E1E1E', '#FFF8E1'], // Dark (off) to Light (on)
   });
 
   return (
