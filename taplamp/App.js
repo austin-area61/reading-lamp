@@ -50,7 +50,7 @@ export default function App() {
         <Text style={styles.sliderLabel}>Brightness</Text>
         <Slider
           style={styles.slider}
-          minimumValue={0.2} // Avoid complete black for readability
+          minimumValue={0.8} // Avoid complete black for readability
           maximumValue={1}
           step={0.1}
           value={brightness}
