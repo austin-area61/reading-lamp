@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -7,20 +7,49 @@ import {
   Switch,
   Animated,
 } from 'react-native';
-import Slider from '@react-native-community/slider'; // Updated import
+import Slider from '@react-native-community/slider';
+import Sound from 'react-native-sound';
 
 export default function App() {
   const [isLampOn, setIsLampOn] = useState(false);
-  const [brightness, setBrightness] = useState(1); // Default brightness
-  const [colorIndex, setColorIndex] = useState(0); // Default lamp-on color (index)
+  const [brightness, setBrightness] = useState(1);
+  const [colorIndex, setColorIndex] = useState(0);
+  const [switchSound, setSwitchSound] = useState<Sound | null>(null);
 
   const backgroundColor = useRef(new Animated.Value(0)).current;
 
-  // Colors comfortable for reading
-  const lampColors = ['#FFF8E1', '#FFE4B5', '#FFECB3']; // Light yellow, light orange, warm white
+  const lampColors = ['#FFF8E1', '#FFE4B5', '#FFECB3'];
+
+  useEffect(() => {
+    // Initialize the sound
+    Sound.setCategory('Playback');
+    const sound = new Sound('switch.mp3', Sound.MAIN_BUNDLE, (error) => {
+      if (error) {
+        console.log('Failed to load the sound', error);
+        return;
+      }
+      setSwitchSound(sound);
+    });
+
+    // Cleanup
+    return () => {
+      if (switchSound) {
+        switchSound.release();
+      }
+    };
+  }, []);
 
   const toggleLamp = () => {
     setIsLampOn((prev) => !prev);
+
+    // Play the switch sound
+    if (switchSound) {
+      switchSound.play((success) => {
+        if (!success) {
+          console.log('Sound did not play successfully');
+        }
+      });
+    }
 
     Animated.timing(backgroundColor, {
       toValue: isLampOn ? 0 : 1,
@@ -29,10 +58,9 @@ export default function App() {
     }).start();
   };
 
-  // Interpolated background color
   const animatedBackgroundColor = backgroundColor.interpolate({
     inputRange: [0, 1],
-    outputRange: ['#1E1E1E', lampColors[colorIndex]], // Off (dark gray) to selected lamp-on color
+    outputRange: ['#1E1E1E', lampColors[colorIndex]],
   });
 
   return (
@@ -42,15 +70,13 @@ export default function App() {
         { backgroundColor: animatedBackgroundColor, opacity: brightness },
       ]}
     >
-      {/* Enlarged Lamp Image */}
       <Image source={require('./images/lamp.png')} style={styles.lampImage} />
 
-      {/* Brightness Slider */}
       <View style={styles.sliderContainer}>
         <Text style={styles.sliderLabel}>Brightness</Text>
         <Slider
           style={styles.slider}
-          minimumValue={0.8} // Avoid complete black for readability
+          minimumValue={0.8}
           maximumValue={1}
           step={0.1}
           value={brightness}
@@ -60,7 +86,6 @@ export default function App() {
         />
       </View>
 
-      {/* Lamp Color Slider */}
       <View style={styles.sliderContainer}>
         <Text style={styles.sliderLabel}>Lamp Color</Text>
         <Slider
@@ -69,13 +94,12 @@ export default function App() {
           maximumValue={lampColors.length - 1}
           step={1}
           value={colorIndex}
-          onValueChange={(value) => setColorIndex(Math.round(value))} // Round for exact color
+          onValueChange={(value) => setColorIndex(Math.round(value))}
           minimumTrackTintColor="#FFD700"
           maximumTrackTintColor="#E0E0E0"
         />
       </View>
 
-      {/* Toggle Switch */}
       <View style={styles.switchArea}>
         <Text style={styles.switchLabel}>{isLampOn ? 'ON' : 'OFF'}</Text>
         <Switch value={isLampOn} onValueChange={toggleLamp} />
@@ -121,3 +145,4 @@ const styles = StyleSheet.create({
     color: 'black',
   },
 });
+
